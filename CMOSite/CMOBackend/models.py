@@ -20,8 +20,8 @@ class Crisis(models.Model):
 class Call(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
 	CallID = models.IntegerField(primary_key=True)
-	ContactPersonName = models.CharField(max_length=200)
-	ContactPersonNumber = models.IntegerField()
+	ContactPersonName = models.CharField(max_length=200, required=False)
+	ContactPersonNumber = models.IntegerField(required=False)
 	Datetime = models.DateTimeField('date time received')
 	BriefDescription = models.CharField()
 	def __str__(self):
