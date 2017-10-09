@@ -4,5 +4,5 @@ from __future__ import unicode_literals
 from django.apps import AppConfig
 
 
-class CmoConfig(AppConfig):
-    name = 'CMO'
+class CmobackendConfig(AppConfig):
+    name = 'CMOBackend'
