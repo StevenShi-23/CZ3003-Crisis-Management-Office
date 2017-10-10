@@ -20,37 +20,63 @@ class Crisis(models.Model):
 class Call(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
 	CallID = models.IntegerField(primary_key=True)
-	ContactPersonName = models.CharField(max_length=200, required=False)
-	ContactPersonNumber = models.IntegerField(required=False)
+	ContactPersonName = models.CharField(max_length=200, blank=True)
+	ContactPersonNumber = models.IntegerField(blank=True)
 	Datetime = models.DateTimeField('date time received')
-	BriefDescription = models.CharField()
+	BriefDescription = models.CharField(max_length=25)
 	def __str__(self):
-		return self.BriefDescription(max_length=255)
+		return self.BriefDescription
 
-@python_2_unicode_compatible
+# @python_2_unicode_compatible
 class Plan(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
 	PlanID = models.IntegerField(primary_key=True)
-	isApprovedByPMO = models.BooleanField(initial=False, required=False)
-	isApprovedByGeneral = models.BooleanField(initial=False, required=False)
+	isApprovedByPMO = models.BooleanField(default=False, blank=True)
+	isApprovedByGeneral = models.BooleanField(default=False, blank=True)
 	Datetime = models.DateTimeField('date time of plan submission')
 	CrisisType = models.CharField(max_length=200)
 	AnalysisOfCase = models.CharField(max_length=255)
 	Map = models.URLField('map url')
 
-@python_2_unicode_compatible
+# @python_2_unicode_compatible
 class SuggestedActions(models.Model):
+
+	MILITARY = 'MIL'
+	BOMB_DISPOSAL = 'BDP'
+	COAST_GUARD = 'CGD'
+	HAZMAT = 'HAZ'
+	SEARCH_AND_RESCUE = 'SNR'
+	CIVILIAN_EVAC = 'CEV'
+	AMBULANCE = 'AMB'
+	EMERGENCY_TRAFFIC_CONTRL = 'ETC'
+	FIREFIGHTING = 'FFT'
+	INFECTIOUS_DISEASE_QUARANTINE = 'IDQ'
+	TROOP_CHOICES = (
+        (MILITARY, 'Military'),
+        (BOMB_DISPOSAL, 'Bomb Disposal'),
+        (COAST_GUARD, 'Coast Guard'),
+        (HAZMAT, 'Hazmat'),
+        (SEARCH_AND_RESCUE, 'Search and Rescue'),
+        (CIVILIAN_EVAC, 'Civilian Evacuation'),
+        (AMBULANCE, 'Ambulance'),
+        (EMERGENCY_TRAFFIC_CONTRL, 'Emergency Traffic Control'),
+        (FIREFIGHTING, 'Firefighters'),
+        (INFECTIOUS_DISEASE_QUARANTINE, 'Infectious Disease Quarantine Personnel'),
+    )
+
 	ActionID = models.IntegerField(primary_key=True)
 	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE)
-	TypeTroop = models.CharField()
+	TypeTroop = models.CharField(
+		max_length=3,
+		choices=TROOP_CHOICES)
 	SeverityLevel = models.IntegerField()
 
-@python_2_unicode_compatible
+# @python_2_unicode_compatible
 class Update(models.Model):
 	UpdateID = models.IntegerField(primary_key=True)
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
-	DateTime = modesl.DateTimeField('Date Published')
-	Status = models.CharField()
-	Comment = models.CharField()
+	DateTime = models.DateTimeField('Date Published')
+	Status = models.CharField(max_length=10)
+	Comment = models.CharField(max_length=255)
 	Location = models.CharField(max_length=200)
 	SeverityLevel = models.IntegerField()
