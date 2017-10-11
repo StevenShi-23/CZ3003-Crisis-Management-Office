@@ -7,14 +7,31 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 import datetime
+import urllib2
+import json
+from pprint import pprint
+import os
+
 
 @python_2_unicode_compatible
 class Crisis(models.Model):
 	Title = models.CharField(max_length=200)
 	Location = models.CharField(max_length=200)
 	DateTime = models.DateTimeField()
+
 	def __str__(self):
 		return self.Title
+
+	def toLatLng(self):
+		urlString = "https://maps.googleapis.com/maps/api/geocode/json?address="+self.Location+"&key="+'AIzaSyAxmNbmdGzDgu_sdi7Je0ENXOmDm80P7wU'
+		print urlString
+		response = urllib2.urlopen(urlString)
+		data = json.load(response)
+		# latlng = {
+		# 	lat : ...,
+		# 	lng : ...
+		# }
+		return (data["results"][0]["geometry"]["location"])
 
 @python_2_unicode_compatible
 class Call(models.Model):
@@ -23,6 +40,7 @@ class Call(models.Model):
 	ContactPersonNumber = models.IntegerField(blank=True)
 	Datetime = models.DateTimeField('date time received')
 	BriefDescription = models.TextField()
+
 	def __str__(self):
 		return self.BriefDescription
 
