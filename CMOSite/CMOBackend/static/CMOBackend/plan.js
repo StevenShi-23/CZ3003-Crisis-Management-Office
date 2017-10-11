@@ -1,20 +1,39 @@
-form_count = 0
+form_count = 0;
+troop_choices = {
+  'MIL' : 'Military',
+  'BDP' : 'Bomb Disposal',
+  'CGD' : 'Coast Guard',
+  'HAZ' : 'Hazmat',
+  'SNR' : 'Search and Rescue',
+  'CEV' : 'Civilian Evacuation',
+  'AMB' : 'Ambulance',
+  'ETC' : 'Emergency Traffic Control',
+  'FFT' : 'Firefighters',
+  'IDQ' : 'Infectious Disease Quarantine Personnel'
+};
 
 function addAction() {
-  var li=$('<li>');
+  var li=$('<li></li>');
   li.attr('id','action'+ form_count);
 
-  new_action_troopType= $('<input type="text"/>');
-  new_action_troopType.attr('name', 'extra_action' + form_count + 'troopType');
-  new_action_troopType.attr('id', 'extra_action' + form_count + 'troopType');
+  new_action_troopType= $('<select></select>');
+  new_action_troopType.attr('name', 'action' + form_count + 'troopType');
+  for (choice in troop_choices){
+    troopType_option= $('<option value="'+choice+'">'+troop_choices[choice]+'</option>');
+    new_action_troopType.append(troopType_option);
+  }
   var newlabel = document.createElement("Label");
-  newlabel.setAttribute("for",'extra_action' + form_count + 'troopType');
+  newlabel.setAttribute("for",'action' + form_count + 'troopType');
   newlabel.innerHTML = "Type of Troop";
 
-  new_action_severity= $('<input type="text"/>');
-  new_action_severity.attr('name', 'extra_action_' + form_count + 'severity');
+  new_action_severity= $('<select></select>');
+  new_action_severity.attr('name', 'action' + form_count + 'severity');
+  for (var i =1; i<=5; i++){
+    severity_option= $('<option value="'+i+'">'+i+'</option>');
+    new_action_severity.append(severity_option);
+  }
   var newlabel2 = document.createElement("Label");
-  newlabel2.setAttribute("for",'extra_action' + form_count + 'severity');
+  newlabel2.setAttribute("for",'action' + form_count + 'severity');
   newlabel2.innerHTML = "Severity Level";
 
   var removeButton = document.createElement('button');

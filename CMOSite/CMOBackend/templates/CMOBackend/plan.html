@@ -10,14 +10,15 @@
   {% endfor %}
 </div>
 
-<form action="{% url 'CMOBackend:savePlan' crisis.CrisisID %}" method="post">
+<form action="{% url 'CMOBackend:savePlan' crisis.id %}" method="post">
 {% csrf_token %}
 <label> Analysis </label>
 <input type="text" name="AnalysisOfCase" />
-<!-- {% for choice in question.choice_set.all %}
-    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
-{% endfor %} -->
+<select name="crisis_choices">
+  <option value="TR">Terrorist</option>
+  <option value="ND">Natural Disaster</option>
+  <option value="EP">Epidemic</option>
+</select>
 <button type="button" onclick="addAction()" id="add-another">Add Action</button>
 <div>
   <ul style="list-style: none;" id="suggested_actions">

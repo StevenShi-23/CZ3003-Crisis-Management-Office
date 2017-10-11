@@ -10,7 +10,6 @@ import datetime
 
 @python_2_unicode_compatible
 class Crisis(models.Model):
-	CrisisID = models.IntegerField(primary_key=True)
 	Title = models.CharField(max_length=200)
 	Location = models.CharField(max_length=200)
 	DateTime = models.DateTimeField()
@@ -20,7 +19,6 @@ class Crisis(models.Model):
 @python_2_unicode_compatible
 class Call(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
-	CallID = models.IntegerField(primary_key=True)
 	ContactPersonName = models.CharField(max_length=200, blank=True)
 	ContactPersonNumber = models.IntegerField(blank=True)
 	Datetime = models.DateTimeField('date time received')
@@ -28,18 +26,17 @@ class Call(models.Model):
 	def __str__(self):
 		return self.BriefDescription
 
-@python_2_unicode_compatible
+# @python_2_unicode_compatible
 class Plan(models.Model):
 	TERRORIST = 'TR'
 	NATURAL_DISASTER = 'ND'
 	EPIDEMIC = 'EP'
-    CRISIS_CHOICES = (
+	CRISIS_CHOICES=(
         (TERRORIST, 'Terrorist'),
         (NATURAL_DISASTER, 'Natural Disaster'),
         (EPIDEMIC, 'Epidemic'),
     )
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
-	PlanID = models.IntegerField(primary_key=True)
 	isApprovedByPMO = models.BooleanField(default=False, blank=True)
 	isApprovedByGeneral = models.BooleanField(default=False, blank=True)
 	Datetime = models.DateTimeField('date time of plan submission')
@@ -47,7 +44,7 @@ class Plan(models.Model):
 	AnalysisOfCase = models.TextField()
 	Map = models.URLField('map url')
 
-@python_2_unicode_compatible
+# @python_2_unicode_compatible
 class SuggestedActions(models.Model):
 
 	MILITARY = 'MIL'
@@ -72,16 +69,14 @@ class SuggestedActions(models.Model):
         (FIREFIGHTING, 'Firefighters'),
         (INFECTIOUS_DISEASE_QUARANTINE, 'Infectious Disease Quarantine Personnel'),
     )
-	ActionID = models.IntegerField(primary_key=True)
 	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE)
 	TypeTroop = models.CharField(
 		max_length=3,
 		choices=TROOP_CHOICES)
 	SeverityLevel = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)])
 
-@python_2_unicode_compatible
+# @python_2_unicode_compatible
 class Update(models.Model):
-	UpdateID = models.IntegerField(primary_key=True)
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
 	DateTime = models.DateTimeField('Date Published')
 	Status = models.CharField(max_length=10)
