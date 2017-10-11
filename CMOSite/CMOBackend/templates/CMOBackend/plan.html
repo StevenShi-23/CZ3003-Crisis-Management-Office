@@ -1,0 +1,32 @@
+{% extends "CMOBackend/base.html" %}
+
+{% block content %}
+<h1>{{ crisis.Title }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<div>
+  {% for call in crisis.call_set.all %}
+  <p> {{ call.BriefDescription }} </p>
+  {% endfor %}
+</div>
+
+<form action="{% url 'CMOBackend:savePlan' crisis.CrisisID %}" method="post">
+{% csrf_token %}
+<label> Analysis </label>
+<input type="text" name="AnalysisOfCase" />
+<!-- {% for choice in question.choice_set.all %}
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
+    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
+{% endfor %} -->
+<button type="button" onclick="addAction()" id="add-another">Add Action</button>
+<div>
+  <ul style="list-style: none;" id="suggested_actions">
+  </ul>
+</div>
+<input type="hidden" name="total_input_fields"/>
+<input type="submit" value="Generate Plan" />
+</form>
+
+{% load static %}
+<script src="{% static 'CMOBackend/plan.js' %}"> </script>
+{% endblock content %}

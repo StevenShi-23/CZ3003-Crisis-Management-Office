@@ -63,7 +63,6 @@ class SuggestedActions(models.Model):
         (FIREFIGHTING, 'Firefighters'),
         (INFECTIOUS_DISEASE_QUARANTINE, 'Infectious Disease Quarantine Personnel'),
     )
-
 	ActionID = models.IntegerField(primary_key=True)
 	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE)
 	TypeTroop = models.CharField(
