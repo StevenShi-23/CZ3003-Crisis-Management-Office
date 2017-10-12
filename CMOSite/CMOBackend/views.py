@@ -12,6 +12,24 @@ def index(request):
     crisis_set = Crisis.objects.all()
     return render(request,'CMOBackend/index.html', {'crisis_set': crisis_set})
 
+def newCall(request) :
+    # crisis_id is given by 911
+    crisis_id = request.POST['CrisisID']
+    crisis, created = Crisis.objects.get_or_create(
+        CrisisID = crisis_id,
+        defaults = {
+            'Title':request.POST['Title'],
+            'Location':request.POST['Location'],
+            'DateTime':datetime.datetime.today(),
+            'Cleared':False})
+    call = Call(
+        CrisisID = get_object_or_404(Crisis, CrisisID = crisis_id),
+    	ContactPersonName = request.POST['ContactPersonName'],
+    	ContactPersonNumber = request.POST['ContactPersonNumber'],
+    	Datetime = datetime.datetime.today(),
+    	BriefDescription = request.POST['BriefDescription'])
+    call.save()
+
 def savePlan(request, crisis_id) :
 
     plan = Plan(

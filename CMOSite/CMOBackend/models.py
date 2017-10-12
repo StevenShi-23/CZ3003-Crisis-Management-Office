@@ -15,6 +15,7 @@ import os
 
 @python_2_unicode_compatible
 class Crisis(models.Model):
+	CrisisID = models.IntegerField(default=000)
 	Title = models.CharField(max_length=200)
 	Location = models.CharField(max_length=200)
 	DateTime = models.DateTimeField()
