@@ -1,34 +1,54 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.shortcuts import render, get_object_or_404, reverse
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Crisis,Call,Plan,SuggestedActions
 
-import datetime
+import datetime, json
 
 def index(request):
     crisis_set = Crisis.objects.all()
     return render(request,'CMOBackend/index.html', {'crisis_set': crisis_set})
 
+
+# api should call to .../CMOBackend/newCall
+# json object should be :
+# {
+# 	"CrisisID" : 3,
+# 	"Title" : "Postman Crisis 2",
+# 	"Location" : "NTU",
+# 	"ContactPersonName" : "Shi Kai",
+# 	"ContactPersonNumber" : 1234567,
+# 	"BriefDescription" : "Post request to create a new Crisis and Call"
+# }
+@csrf_exempt
 def newCall(request) :
     # crisis_id is given by 911
-    crisis_id = request.POST['CrisisID']
-    crisis, created = Crisis.objects.get_or_create(
-        CrisisID = crisis_id,
-        defaults = {
-            'Title':request.POST['Title'],
-            'Location':request.POST['Location'],
-            'DateTime':datetime.datetime.today(),
-            'Cleared':False})
+    json_data = json.loads(request.body)
+    crisis_id = json_data['CrisisID']
+    try :
+        crisis = Crisis.objects.get(CrisisID = crisis_id)
+    except Crisis.DoesNotExist :
+        crisis, created = Crisis.objects.get_or_create(
+            CrisisID = crisis_id,
+            Title = json_data['Title'],
+            Location = json_data['Location'],
+            DateTime = datetime.datetime.today(),
+            Cleared = False
+        )
     call = Call(
-        CrisisID = get_object_or_404(Crisis, CrisisID = crisis_id),
-    	ContactPersonName = request.POST['ContactPersonName'],
-    	ContactPersonNumber = request.POST['ContactPersonNumber'],
+        CrisisID = crisis,
+    	ContactPersonName = json_data['ContactPersonName'],
+    	ContactPersonNumber = json_data['ContactPersonNumber'],
     	Datetime = datetime.datetime.today(),
-    	BriefDescription = request.POST['BriefDescription'])
+    	BriefDescription = json_data['BriefDescription']
+        )
     call.save()
+
+    return JsonResponse({'success': True})
 
 def savePlan(request, crisis_id) :
 
