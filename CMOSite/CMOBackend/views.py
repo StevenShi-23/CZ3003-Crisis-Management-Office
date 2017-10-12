@@ -23,14 +23,14 @@ def savePlan(request, crisis_id) :
          )
     crisis = get_object_or_404(Crisis, pk = crisis_id)
     totalActions = int(request.POST['total_input_fields']) + 1
-    # plan.save()
-    # for i in range(0,totalActions) :
-    #     if 'action'+str(i)+'troopType'in request.POST :
-    #         suggested_action = SuggestedActions.objects.create(
-    #         PlanID = plan,
-    #         TypeTroop = request.POST['action'+str(i)+'troopType'],
-    #         SeverityLevel = request.POST['action'+str(i)+'severity'],
-    #         )
+    plan.save()
+    for i in range(0,totalActions) :
+        if 'action'+str(i)+'troopType'in request.POST :
+            suggested_action = SuggestedActions.objects.create(
+            PlanID = plan,
+            TypeTroop = request.POST['action'+str(i)+'troopType'],
+            SeverityLevel = request.POST['action'+str(i)+'severity'],
+            )
 
     return HttpResponse(request.POST, content_type='application/json')
 
