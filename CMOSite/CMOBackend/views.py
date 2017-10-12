@@ -9,7 +9,8 @@ from .models import Crisis,Call,Plan,SuggestedActions
 import datetime
 
 def index(request):
-    return render(request,'CMOBackend/index.html')
+    crisis_set = Crisis.objects.all()
+    return render(request,'CMOBackend/index.html', {'crisis_set': crisis_set})
 
 def savePlan(request, crisis_id) :
 
@@ -21,7 +22,6 @@ def savePlan(request, crisis_id) :
          Map = "Https://google.com"
          )
     crisis = get_object_or_404(Crisis, pk = crisis_id)
-    crisis.toLatLng()
     totalActions = int(request.POST['total_input_fields']) + 1
     # plan.save()
     # for i in range(0,totalActions) :
