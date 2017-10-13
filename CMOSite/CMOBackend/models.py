@@ -26,7 +26,6 @@ class Crisis(models.Model):
 
 	def toLatLng(self):
 		urlString = "https://maps.googleapis.com/maps/api/geocode/json?address="+self.Location+"&key="+'AIzaSyAxmNbmdGzDgu_sdi7Je0ENXOmDm80P7wU'
-		print urlString
 		response = urllib2.urlopen(urlString)
 		data = json.load(response)
 		# latlng = {

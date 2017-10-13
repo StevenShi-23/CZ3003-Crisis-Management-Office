@@ -74,4 +74,12 @@ def savePlan(request, crisis_id) :
 
 def plan(request, crisis_id):
     crisis = get_object_or_404(Crisis, pk = crisis_id)
-    return render(request, 'CMOBackend/plan.html', {'crisis': crisis})
+    return render(request, 'CMOBackend/plan', {'crisis': crisis})
+
+def maps(request):
+    crisis_set = Crisis.objects.all()
+    return render(request, 'CMOBackend/map',  {'crisis_set': crisis_set})
+
+def map(request, crisis_id):
+    crisis = Crisis.objects.filter(pk = crisis_id)
+    return render(request,'CMOBackend/map', {'crisis_set' : crisis})
