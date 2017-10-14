@@ -15,8 +15,16 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'^CMOBackend/', include('CMOBackend.urls')),
     url(r'^admin/', admin.site.urls),
+    #Add URL maps to redirect the base URL to our application
+    url(r'^$', RedirectView.as_view(url='/accounts/login', permanent=True)),
+]
+
+#Add Django site authentication urls (for login, logout, password management)
+urlpatterns += [
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 ]
