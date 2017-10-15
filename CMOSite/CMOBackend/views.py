@@ -50,8 +50,46 @@ def newCall(request) :
 
     return JsonResponse({'success': True})
 
-def savePlan(request, crisis_id) :
+def gApprovePlan(request, plan_id):
+    plan = get_object_or_404(Plan, pk = plan_id)
+    plan.isApprovedByGeneral =  True
+    plan.save()
+    # call to PMO
+    return HttpResponseRedirect(reverse('CMOBackend:index'))
 
+def activatePlan(request, plan_id) :
+    # call to EF
+    pass
+
+def editPlan(request, crisis_id):
+    crisis = get_object_or_404(Crisis, pk = crisis_id)
+    plan = crisis.plan_set.all()[0]
+    troopEnum = {
+        'MIL' : 'Military',
+        'BDP' : 'Bomb Disposal',
+        'CGD' : 'Coast Guard',
+        'HAZ' : 'Hazmat',
+        'SNR' : 'Search and Rescue',
+        'CEV' : 'Civilian Evacuation',
+        'AMB' : 'Ambulance',
+        'ETC' : 'Emergency Traffic Control',
+        'FFT' : 'Firefighters',
+        'IDQ' : 'Infectious Disease Quarantine'
+    }
+    sevEnum = [1,2,3,4,5]
+    return render(request,'CMOBackend/newPlan.html', {'plan': plan, 'crisis' : crisis, 'troopEnum': troopEnum, 'sevEnum' :sevEnum})
+
+def viewPlan(request,crisis_id):
+    crisis = get_object_or_404(Crisis, pk = crisis_id)
+    plan_set = crisis.plan_set.all()
+    if (not plan_set.exists()) :
+        return newPlan(request, crisis_id)
+    return render(request,'CMOBackend/plan.html', {'plan': plan_set[0], 'crisis' : crisis})
+
+def updatePlan(request, plan_id):
+    pass
+
+def savePlan(request, crisis_id) :
     plan = Plan(
          CrisisID = get_object_or_404(Crisis, pk = crisis_id),
          Datetime = datetime.datetime.today(),
@@ -62,19 +100,18 @@ def savePlan(request, crisis_id) :
     crisis = get_object_or_404(Crisis, pk = crisis_id)
     totalActions = int(request.POST['total_input_fields']) + 1
     plan.save()
-    for i in range(0,totalActions) :
+    for i in range(1,totalActions+1) :
         if 'action'+str(i)+'troopType'in request.POST :
             suggested_action = SuggestedActions.objects.create(
             PlanID = plan,
             TypeTroop = request.POST['action'+str(i)+'troopType'],
             SeverityLevel = request.POST['action'+str(i)+'severity'],
             )
+    return HttpResponseRedirect(reverse('CMOBackend:index'))
 
-    return HttpResponse(request.POST, content_type='application/json')
-
-def plan(request, crisis_id):
+def newPlan(request, crisis_id):
     crisis = get_object_or_404(Crisis, pk = crisis_id)
-    return render(request, 'CMOBackend/plan', {'crisis': crisis})
+    return render(request, 'CMOBackend/newPlan.html', {'crisis': crisis})
 
 def maps(request):
     crisis_set = Crisis.objects.all()

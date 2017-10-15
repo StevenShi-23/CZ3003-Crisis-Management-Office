@@ -62,6 +62,8 @@ class Plan(models.Model):
 	CrisisType = models.CharField(max_length=2, choices=CRISIS_CHOICES)
 	AnalysisOfCase = models.TextField()
 	Map = models.URLField('map url')
+	def __str__(self):
+		return self.CrisisID.Title
 
 # @python_2_unicode_compatible
 class SuggestedActions(models.Model):

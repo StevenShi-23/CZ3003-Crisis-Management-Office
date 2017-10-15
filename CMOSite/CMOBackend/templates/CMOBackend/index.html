@@ -16,7 +16,7 @@
     {% for crisis in crisis_set %}
     <tr>
       <td class = "mdl-data-table__cell--non-numeric">{{crisis.id}}</td>
-      <td> <a style="color: gray;" href="{% url 'CMOBackend:plan' crisis.id %}">{{crisis.Title}}</a></td>
+      <td> <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a></td>
       <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
       <td>{{crisis.Location}}</td>
       <td>{% if crisis.Cleared %} Cleared {% else %} Not Cleared {% endif %}</td>

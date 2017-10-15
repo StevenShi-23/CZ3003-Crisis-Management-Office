@@ -1,4 +1,4 @@
-form_count = 0;
+form_count = $( "li" ).length;
 troop_choices = {
   'MIL' : 'Military',
   'BDP' : 'Bomb Disposal',

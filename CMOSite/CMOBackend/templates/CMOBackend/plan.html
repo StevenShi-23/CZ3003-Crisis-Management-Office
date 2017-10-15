@@ -3,31 +3,83 @@
 {% block content %}
 <h1>{{ crisis.Title }}</h1>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<div>
-  {% for call in crisis.call_set.all %}
-  <p> {{ call.BriefDescription }} </p>
-  {% endfor %}
-</div>
+<div class='container'>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>{{ plan.AnalysisOfCase }}</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-2">
+      Date of Last Update
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{plan.Datetime|date:'d-m-Y H:i'}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-2">
+      Map
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      <a href="{% url 'CMOBackend:map' crisis.id %}">Access the Map</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-2">
+      Crisis Type
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{plan.get_CrisisType_display}}
+    </div>
+  </div>
 
-<form action="{% url 'CMOBackend:savePlan' crisis.id %}" method="post">
-{% csrf_token %}
-<label> Analysis </label>
-<input type="text" name="AnalysisOfCase" />
-<select name="crisis_choices">
-  <option value="TR">Terrorist</option>
-  <option value="ND">Natural Disaster</option>
-  <option value="EP">Epidemic</option>
-</select>
-<button type="button" onclick="addAction()" id="add-another">Add Action</button>
-<div>
-  <ul style="list-style: none;" id="suggested_actions">
-  </ul>
+  {% for action in plan.suggestedactions_set.all %}
+  <div class="row">
+    <div class="col-xs-2">
+      Security Level
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{action.SeverityLevel}}
+    </div>
+    <div class="col-xs-2">
+      Troop Type
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{action.get_TypeTroop_display}}
+    </div>
+  </div>
+  {% endfor %}
+  <br />
+  <div class="row">
+    <!-- if user is not general, do not show this button -->
+    {% if not plan.isApprovedByGeneral %}
+    <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
+    {% endif %}
+    <!--  if user is not analyst, do not show this button -->
+    <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" onclick="editPlan()" class='btn' >Edit Plan</button></a>
+    {% if plan.isApprovedByPMO %}
+    <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="button" class='btn btn-danger' >Activate Plan</button></a>
+    {% endif %}
+  </div>
 </div>
-<input type="hidden" name="total_input_fields"/>
-<input type="submit" value="Generate Plan" />
-</form>
 
 {% load static %}
 <script src="{% static 'CMOBackend/plan.js' %}"> </script>
+
 {% endblock content %}
