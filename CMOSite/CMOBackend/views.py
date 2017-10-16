@@ -90,17 +90,22 @@ def updatePlan(request, plan_id):
     pass
 
 def savePlan(request, crisis_id) :
-    plan = Plan(
-         CrisisID = get_object_or_404(Crisis, pk = crisis_id),
-         Datetime = datetime.datetime.today(),
-         CrisisType = request.POST['crisis_choices'],
-         AnalysisOfCase = request.POST['AnalysisOfCase'],
-         Map = "Https://google.com"
-         )
     crisis = get_object_or_404(Crisis, pk = crisis_id)
-    totalActions = int(request.POST['total_input_fields']) + 1
+    plan_set = crisis.plan_set.all()
+    if (not plan_set.exists()):
+        plan = Plan(
+             CrisisID = crisis,
+             Datetime = datetime.datetime.today(),
+             CrisisType = request.POST['crisis_choices'],
+             AnalysisOfCase = request.POST['AnalysisOfCase'],
+             Map = "Https://google.com"
+             )
+    else :
+        plan = plan_set[0]
+    totalActions = int(request.POST['total_input_fields'])
     plan.save()
-    for i in range(1,totalActions+1) :
+    plan.suggestedactions_set.all().delete()
+    for i in range(1,totalActions) :
         if 'action'+str(i)+'troopType'in request.POST :
             suggested_action = SuggestedActions.objects.create(
             PlanID = plan,
