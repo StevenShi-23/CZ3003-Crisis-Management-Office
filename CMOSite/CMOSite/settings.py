@@ -28,7 +28,7 @@ SECRET_KEY = 'dzd1r6j!h4dgeq%j%sd1*fantk26tf--v_yt@p$#b8a06zhzm5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cz3003.herokuapp.com']
+ALLOWED_HOSTS = ['cz3003.herokuapp.com','localhost']
 
 
 # Application definition
@@ -123,7 +123,7 @@ USE_TZ = True
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfile')
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
