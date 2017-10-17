@@ -98,7 +98,7 @@ def savePlan(request, crisis_id) :
              Datetime = datetime.datetime.today(),
              CrisisType = request.POST['crisis_choices'],
              AnalysisOfCase = request.POST['AnalysisOfCase'],
-             Map = "Https://google.com"
+             Map = "https://shielded-harbor-57780.herokuapp.com/"+str(crisis_id)+"/map"
              )
     else :
         plan = plan_set[0]
