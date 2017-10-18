@@ -1,4 +1,5 @@
 form_count = $( "li" ).length + 1;
+$("[name=total_input_fields]").val(form_count);
 troop_choices = {
   'MIL' : 'Military',
   'BDP' : 'Bomb Disposal',

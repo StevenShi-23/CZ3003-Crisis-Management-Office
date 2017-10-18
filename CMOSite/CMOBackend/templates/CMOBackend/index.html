@@ -19,7 +19,7 @@
       <td> <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a></td>
       <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
       <td>{{crisis.Location}}</td>
-      <td>{% if crisis.Cleared %} Cleared {% else %} Not Cleared {% endif %}</td>
+      <td>{{ crisis.get_CrisisStatus_display }}</td>
     </tr>
     {% endfor %}
   </tbody>

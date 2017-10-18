@@ -53,29 +53,29 @@ def newCall(request) :
 def gApprovePlan(request, plan_id):
     plan = get_object_or_404(Plan, pk = plan_id)
     plan.isApprovedByGeneral =  True
+    changeStatus(plan.CrisisID, "PAG")
     plan.save()
     # call to PMO
     return HttpResponseRedirect(reverse('CMOBackend:index'))
 
+def PMOApprove(request, plan_id):
+    plan = get_object_or_404(Plan, pk = plan_id)
+    changeStatus(plan.CrisisID, "PAP")
+    plan.save()
+    pass
+
 def activatePlan(request, plan_id) :
+    plan = get_object_or_404(Plan, pk = plan_id)
+    changeStatus(plan.CrisisID, "PA")
     # call to EF
     pass
 
 def editPlan(request, crisis_id):
     crisis = get_object_or_404(Crisis, pk = crisis_id)
     plan = crisis.plan_set.all()[0]
-    troopEnum = {
-        'MIL' : 'Military',
-        'BDP' : 'Bomb Disposal',
-        'CGD' : 'Coast Guard',
-        'HAZ' : 'Hazmat',
-        'SNR' : 'Search and Rescue',
-        'CEV' : 'Civilian Evacuation',
-        'AMB' : 'Ambulance',
-        'ETC' : 'Emergency Traffic Control',
-        'FFT' : 'Firefighters',
-        'IDQ' : 'Infectious Disease Quarantine'
-    }
+    troopEnum={}
+    for key,value in SuggestedActions.TROOP_CHOICES :
+        troopEnum[key] = value
     sevEnum = [1,2,3,4,5]
     return render(request,'CMOBackend/newPlan.html', {'plan': plan, 'crisis' : crisis, 'troopEnum': troopEnum, 'sevEnum' :sevEnum})
 
@@ -87,6 +87,8 @@ def viewPlan(request,crisis_id):
     return render(request,'CMOBackend/plan.html', {'plan': plan_set[0], 'crisis' : crisis})
 
 def updatePlan(request, plan_id):
+    plan = get_object_or_404(Plan, pk = plan_id)
+    changeStatus(plan.CrisisID, "UP")
     pass
 
 def savePlan(request, crisis_id) :
@@ -98,7 +100,7 @@ def savePlan(request, crisis_id) :
              Datetime = datetime.datetime.today(),
              CrisisType = request.POST['crisis_choices'],
              AnalysisOfCase = request.POST['AnalysisOfCase'],
-             Map = "https://shielded-harbor-57780.herokuapp.com/"+str(crisis_id)+"/map"
+             Map = "https://cz3003.herokuapp.com/"+str(crisis_id)+"/map"
              )
     else :
         plan = plan_set[0]
@@ -112,6 +114,8 @@ def savePlan(request, crisis_id) :
             TypeTroop = request.POST['action'+str(i)+'troopType'],
             SeverityLevel = request.POST['action'+str(i)+'severity'],
             )
+    crisis.CrisisStatus = "PF"
+    crisis.save()
     return HttpResponseRedirect(reverse('CMOBackend:index'))
 
 def newPlan(request, crisis_id):
@@ -125,3 +129,9 @@ def maps(request):
 def map(request, crisis_id):
     crisis = Crisis.objects.filter(pk = crisis_id)
     return render(request,'CMOBackend/map', {'crisis_set' : crisis})
+
+def changeStatus(CrisisID,newStatus) :
+    crisis = get_object_or_404(Crisis, pk = CrisisID)
+    crisis.CrisisStatus = newStatus
+    crisis.save()
+    return

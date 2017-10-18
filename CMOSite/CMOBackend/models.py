@@ -19,7 +19,23 @@ class Crisis(models.Model):
 	Title = models.CharField(max_length=200)
 	Location = models.CharField(max_length=200)
 	DateTime = models.DateTimeField()
-	Cleared = models.BooleanField(default=False)
+	PLAN_ACTIVATED = 'PA'
+	PLAN_FORMED = 'PF'
+	PLAN_APPROVED_GENERAL = 'PAG'
+	PLAN_APPROVED_PMO = 'PAP'
+	CRISIS_OVER = "CO"
+	UPDATE_PENDING = "UP"
+	NEW_CRISIS = "NC"
+	CRISIS_STATUS=(
+        (NEW_CRISIS, 'New Crisis, Awaiting Plan'),
+        (PLAN_FORMED, 'Plan Formed, Awaiting Authorization'),
+        (PLAN_APPROVED_GENERAL, 'Approved by General, Awaiting Authorization'),
+        (PLAN_APPROVED_PMO, 'Authorized, Awaiting Activation'),
+        (PLAN_ACTIVATED, 'Plan In Action'),
+        (UPDATE_PENDING, 'New Update Received'),
+        (CRISIS_OVER, 'Crisis Cleared'),
+    )
+	CrisisStatus = models.CharField(max_length=3, choices=CRISIS_STATUS, default="NC")
 
 	def __str__(self):
 		return self.Title
