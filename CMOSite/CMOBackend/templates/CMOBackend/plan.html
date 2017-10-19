@@ -1,6 +1,12 @@
 {% extends "CMOBackend/base.html" %}
 
 {% block content %}
+
+<form action="{% url 'CMOBackend:activatePlan' plan.id %}" method="post">
+{% csrf_token %}
+<input id='location' type="hidden" value="{{ crisis.Location }}" name="location"/>
+<input id='lat' type="hidden" value="" name="lat"/>
+<input id='lng' type="hidden" value="" name="lng"/>
 <h1>{{ crisis.Title }}</h1>
 
 <div class='container'>
@@ -81,12 +87,13 @@
     <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
     {% endif %}
     <!--  if user is not analyst, do not show this button -->
-    <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" onclick="editPlan()" class='btn' >Edit Plan</button></a>
+    <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" class='btn' >Edit Plan</button></a>
     {% if plan.isApprovedByPMO %}
-    <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="button" class='btn btn-danger' >Activate Plan</button></a>
+    <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
     {% endif %}
   </div>
 </div>
+</form>
 
 {% load static %}
 <script src="{% static 'CMOBackend/plan.js' %}"> </script>

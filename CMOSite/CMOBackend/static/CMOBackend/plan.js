@@ -13,6 +13,11 @@ troop_choices = {
   'IDQ' : 'Infectious Disease Quarantine Personnel'
 };
 
+$.ajax({url: "https://maps.googleapis.com/maps/api/geocode/json?address="+$('#location').val()+"&key="+'AIzaSyAxmNbmdGzDgu_sdi7Je0ENXOmDm80P7wU', success: function(result){
+  $('#lat').val(result.results[0].geometry.location.lat)
+  $('#lng').val(result.results[0].geometry.location.lng)
+  }});
+
 function addAction() {
   var li=$('<li></li>');
   li.attr('id','action'+ form_count);

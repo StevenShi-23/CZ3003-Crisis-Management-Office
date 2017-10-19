@@ -10,6 +10,7 @@ from .models import Crisis,Call,Plan,SuggestedActions, PlanComments
 import datetime, json, requests
 
 PMO_POST_URL = ""
+EF_POST_URL = ""
 
 def index(request):
     crisis_set = Crisis.objects.all()
@@ -104,9 +105,26 @@ def PMOApprove(request):
 
 def activatePlan(request, plan_id) :
     plan = get_object_or_404(Plan, pk = plan_id)
+    crisis = plan.CrisisID
     changeStatus(plan.CrisisID, "PA")
-    # call to EF
-    pass
+    print(request.POST['lat'])
+    actions = []
+    for action in plan.suggestedactions_set.all() :
+        actions.append({
+            'TroopType' : action.get_TypeTroop_display(),
+            'Severity'  : action.SeverityLevel
+        })
+    EFActivation = {
+        'CrisisID' : crisis.id,
+        'PlanID' : plan.id,
+        'CrisisType' : plan.CrisisType,
+        'Description' : plan.AnalysisOfCase,
+        'Lat': request.POST['lat'],
+        'Lng': request.POST['lng'],
+        'SuggestedActions': actions
+    }
+    # requests.post(EF_POST_URL, data=EFActivation)
+    return HttpResponseRedirect(reverse('CMOBackend:index'))
 
 def editPlan(request, crisis_id):
     crisis = get_object_or_404(Crisis, pk = crisis_id)
