@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^maps$', views.maps, name='maps'),
     url(r'^(?P<crisis_id>[0-9]+)/map$', views.map, name='map'),
     url(r'^(?P<crisis_id>[0-9]+)/plan/edit$', views.editPlan, name='editPlan'),
+    url(r'^planFeedback$', views.PMOApprove, name='PMOApprove'),
 ]

@@ -23,6 +23,7 @@ class Crisis(models.Model):
 	PLAN_FORMED = 'PF'
 	PLAN_APPROVED_GENERAL = 'PAG'
 	PLAN_APPROVED_PMO = 'PAP'
+	PLAN_REJECTED_PMO = 'PJP'
 	CRISIS_OVER = "CO"
 	UPDATE_PENDING = "UP"
 	NEW_CRISIS = "NC"
@@ -31,6 +32,7 @@ class Crisis(models.Model):
         (PLAN_FORMED, 'Plan Formed, Awaiting Authorization'),
         (PLAN_APPROVED_GENERAL, 'Approved by General, Awaiting Authorization'),
         (PLAN_APPROVED_PMO, 'Authorized, Awaiting Activation'),
+        (PLAN_REJECTED_PMO, 'Plan Rejected, Replanning Required'),
         (PLAN_ACTIVATED, 'Plan In Action'),
         (UPDATE_PENDING, 'New Update Received'),
         (CRISIS_OVER, 'Crisis Cleared'),
@@ -80,6 +82,12 @@ class Plan(models.Model):
 	Map = models.URLField('map url')
 	def __str__(self):
 		return self.CrisisID.Title
+
+class PlanComments(models.Model):
+	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE)
+	Comment = models.TextField()
+	def __str__(self):
+		return self.Comment
 
 # @python_2_unicode_compatible
 class SuggestedActions(models.Model):

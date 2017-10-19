@@ -66,6 +66,15 @@
   </div>
   {% endfor %}
   <br />
+  <h3>Comments From PMO</h3>
+  <div class="row">
+    {% for comment in plan.plancomments_set.all %}
+    <div class='col-xs-10 col-xs-offset-1'>
+      {{comment.Comment}}
+    </div>
+    {% endfor %}
+  </div>
+  <br />
   <div class="row">
     <!-- if user is not general, do not show this button -->
     {% if not plan.isApprovedByGeneral %}

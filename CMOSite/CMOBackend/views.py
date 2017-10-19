@@ -5,16 +5,18 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Crisis,Call,Plan,SuggestedActions
+from .models import Crisis,Call,Plan,SuggestedActions, PlanComments
 
-import datetime, json
+import datetime, json, requests
+
+PMO_POST_URL = ""
 
 def index(request):
     crisis_set = Crisis.objects.all()
     return render(request,'CMOBackend/index.html', {'crisis_set': crisis_set})
 
 
-# api should call to .../CMOBackend/newCall
+# api should call to .../newCall
 # json object should be :
 # {
 # 	"CrisisID" : 3,
@@ -53,16 +55,52 @@ def newCall(request) :
 def gApprovePlan(request, plan_id):
     plan = get_object_or_404(Plan, pk = plan_id)
     plan.isApprovedByGeneral =  True
-    changeStatus(plan.CrisisID, "PAG")
+    changeStatus(plan.CrisisID, Crisis.PLAN_APPROVED_GENERAL)
     plan.save()
-    # call to PMO
+    actions = []
+    for action in plan.suggestedactions_set.all() :
+        actions.append({
+            'TroopType' : action.get_TypeTroop_display(),
+            'Severity'  : action.SeverityLevel
+        })
+    planInfo = {
+        'PlanID' : plan.id,
+        'dateTime' : plan.Datetime,
+        'CrisisType' : plan.get_CrisisType_display(),
+        'AnalysisOfCase' : plan.AnalysisOfCase,
+        'Map' : plan.Map,
+        'SuggestedActions' : actions
+    }
+    # requests.post(PMO_POST_URL, data=planInfo)
     return HttpResponseRedirect(reverse('CMOBackend:index'))
 
-def PMOApprove(request, plan_id):
+# api should call to .../planFeedback
+# json object should be :
+# {
+# 	"PlanID" : 3,
+# 	"Approved" : 'true',
+#   "Comments" : "good plan"
+# }
+@csrf_exempt
+def PMOApprove(request):
+    json_data = json.loads(request.body)
+    plan_id = json_data['PlanID']
+    approved = json_data['Approved']
     plan = get_object_or_404(Plan, pk = plan_id)
-    changeStatus(plan.CrisisID, "PAP")
-    plan.save()
-    pass
+    comments, created=PlanComments.objects.get_or_create(
+        PlanID = plan,
+        Comment = json_data['Comments'],
+    )
+    if (plan.CrisisID.CrisisStatus != Crisis.PLAN_APPROVED_GENERAL) :
+        return JsonResponse({'received': False})
+    if (approved == 'True') :
+        changeStatus(plan.CrisisID, Crisis.PLAN_APPROVED_PMO)
+        plan.isApprovedByPMO = True
+        plan.save()
+    else :
+        plan.isApprovedByGeneral = False
+        changeStatus(plan.CrisisID, Crisis.PLAN_REJECTED_PMO)
+    return JsonResponse({'received': True})
 
 def activatePlan(request, plan_id) :
     plan = get_object_or_404(Plan, pk = plan_id)
@@ -105,6 +143,8 @@ def savePlan(request, crisis_id) :
     else :
         plan = plan_set[0]
     totalActions = int(request.POST['total_input_fields'])
+    plan.isApprovedByGeneral = False
+    plan.isApprovedByPMO = False
     plan.save()
     plan.suggestedactions_set.all().delete()
     for i in range(1,totalActions) :
@@ -130,8 +170,7 @@ def map(request, crisis_id):
     crisis = Crisis.objects.filter(pk = crisis_id)
     return render(request,'CMOBackend/map', {'crisis_set' : crisis})
 
-def changeStatus(CrisisID,newStatus) :
-    crisis = get_object_or_404(Crisis, pk = CrisisID)
+def changeStatus(crisis,newStatus) :
     crisis.CrisisStatus = newStatus
     crisis.save()
     return
