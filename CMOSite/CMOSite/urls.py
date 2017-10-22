@@ -15,8 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic import RedirectView
+from . import views
 
 urlpatterns = [
     url(r'^', include('CMOBackend.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
+    url(r'^$', RedirectView.as_view(url='/accounts/login', permanent=True)),
 ]
+

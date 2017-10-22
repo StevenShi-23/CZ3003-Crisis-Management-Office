@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Crisis,Call,Plan,SuggestedActions, PlanComments
+from .models import Crisis,Call,Plan,SuggestedActions, PlanComments, Profile
 
 import datetime, json, requests
 
@@ -14,8 +14,9 @@ EF_POST_URL = ""
 
 def index(request):
     crisis_set = Crisis.objects.all()
+    if (Profile.role == Profile.GENERAL):
+        return render(request,'CMOBackend/newPlan.html', {'plan': plan, 'crisis' : crisis, 'troopEnum': troopEnum, 'sevEnum' :sevEnum})
     return render(request,'CMOBackend/index.html', {'crisis_set': crisis_set})
-
 
 # api should call to .../newCall
 # json object should be :
