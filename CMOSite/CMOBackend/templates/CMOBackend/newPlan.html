@@ -1,0 +1,79 @@
+{% extends "CMOBackend/base.html" %}
+
+{% block content %}
+<h1>{{ crisis.Title }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<div>
+  {% for call in crisis.call_set.all %}
+  <p> {{ call.BriefDescription }} </p>
+  {% endfor %}
+</div>
+
+<form action="{% url 'CMOBackend:savePlan' crisis.id %}" method="post">
+{% csrf_token %}
+<label> Analysis </label>
+<input type="text" name="AnalysisOfCase" value="{{ plan.AnalysisOfCase}}"/>
+<select name="crisis_choices">
+  {% ifequal plan.CrisisType "TR" %}
+    <option value="TR" selected>Terrorist</option>
+  {% else %}
+    <option value="TR">Terrorist</option>
+  {% endifequal %}
+  {% ifequal plan.CrisisType "ND" %}
+    <option value="ND" selected>Natural Disaster</option>
+  {% else %}
+    <option value="ND">Natural Disaster</option>
+  {% endifequal %}
+  {% ifequal plan.CrisisType "EP" %}
+    <option value="EP" selected>Epidemic</option>
+  {% else %}
+    <option value="EP">Epidemic</option>
+  {% endifequal %}
+</select>
+<button type="button" class='btn' onclick="addAction()" id="add-another">Add Action</button>
+<div>
+  <ul style="list-style: none;" id="suggested_actions">
+    {% for action in plan.suggestedactions_set.all %}
+      <li id='existing{{ forloop.counter }}'>
+        <label>Type of Troop</label>
+        <select name="action{{forloop.counter}}troopType">
+          {% for key,val in troopEnum.items %}
+            {% ifequal action.TypeTroop key %}
+              <option value="{{key}}" selected>{{val}}</option>
+            {% else %}
+              <option value="{{key}}">{{val}}</option>
+            {% endifequal %}
+          {% endfor %}
+        </select>
+        <label>Severity Level</label>
+        <select name="action{{forloop.counter}}severity">
+          {% for severity in sevEnum %}
+          {% ifequal action.SeverityLevel severity %}
+            <option value="{{severity}}" selected>{{severity}}</option>
+          {% else %}
+            <option value="{{severity}}">{{severity}}</option>
+          {% endifequal %}
+          {% endfor %}
+        </select>
+        <button type='button' onclick="removeAction('existing{{ forloop.counter }}')">&#10006;</button>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+<br />
+<h3>Comments From PMO</h3>
+<div class="row">
+  {% for comment in plan.plancomments_set.all %}
+  <div class='col-xs-10 col-xs-offset-1'>
+    {{comment.Comment}}
+  </div>
+  {% endfor %}
+</div>
+<input type="hidden" name="total_input_fields"/>
+<input type="submit" class='btn' value="Generate Plan" />
+</form>
+
+{% load static %}
+<script src="{% static 'CMOBackend/plan.js' %}"> </script>
+{% endblock content %}

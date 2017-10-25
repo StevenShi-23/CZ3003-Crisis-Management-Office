@@ -1,0 +1,101 @@
+{% extends "CMOBackend/base.html" %}
+
+{% block content %}
+
+<form action="{% url 'CMOBackend:activatePlan' plan.id %}" method="post">
+{% csrf_token %}
+<input id='location' type="hidden" value="{{ crisis.Location }}" name="location"/>
+<input id='lat' type="hidden" value="" name="lat"/>
+<input id='lng' type="hidden" value="" name="lng"/>
+<h1>{{ crisis.Title }}</h1>
+
+<div class='container'>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>{{ plan.AnalysisOfCase }}</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-2">
+      Date of Last Update
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{plan.Datetime|date:'d-m-Y H:i'}}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-2">
+      Map
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      <a href="{% url 'CMOBackend:map' crisis.id %}">Access the Map</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-2">
+      Crisis Type
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{plan.get_CrisisType_display}}
+    </div>
+  </div>
+
+  {% for action in plan.suggestedactions_set.all %}
+  <div class="row">
+    <div class="col-xs-2">
+      Security Level
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{action.SeverityLevel}}
+    </div>
+    <div class="col-xs-2">
+      Troop Type
+    </div>
+    <div class="col-xs-1">
+      :
+    </div>
+    <div class="col-xs-3">
+      {{action.get_TypeTroop_display}}
+    </div>
+  </div>
+  {% endfor %}
+  <br />
+  <h3>Comments From PMO</h3>
+  <div class="row">
+    {% for comment in plan.plancomments_set.all %}
+    <div class='col-xs-10 col-xs-offset-1'>
+      {{comment.Comment}}
+    </div>
+    {% endfor %}
+  </div>
+  <br />
+  <div class="row">
+    <!-- if user is not general, do not show this button -->
+    {% if not plan.isApprovedByGeneral %}
+    <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
+    {% endif %}
+    <!--  if user is not analyst, do not show this button -->
+    <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" class='btn' >Edit Plan</button></a>
+    {% if plan.isApprovedByPMO %}
+    <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
+    {% endif %}
+  </div>
+</div>
+</form>
+
+{% load static %}
+<script src="{% static 'CMOBackend/plan.js' %}"> </script>
+
+{% endblock content %}

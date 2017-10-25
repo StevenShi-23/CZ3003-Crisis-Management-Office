@@ -1,0 +1,30 @@
+<script src = "https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+<link rel = "stylesheet" href = "https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
+<link rel = "stylesheet" href = "https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<!--Logout-->
+<a href="{% url 'login' %}">Logout</a>
+
+<table class = "mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+  <thead>
+    <tr>
+      <th class = "mdl-data-table__cell--non-numeric">CrisisID</th>
+      <th>Title</th>
+      <th>Time</th>
+      <th>Location</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+<!-- Below is the data table-->
+  <tbody>
+    {% for crisis in crisis_set %}
+    <tr>
+      <td class = "mdl-data-table__cell--non-numeric">{{crisis.id}}</td>
+      <td> <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a></td>
+      <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
+      <td>{{crisis.Location}}</td>
+      <td>{{ crisis.get_CrisisStatus_display }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
