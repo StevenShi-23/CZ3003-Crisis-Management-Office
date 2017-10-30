@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Crisis,Call,Plan,SuggestedActions, PlanComments, Profile
+from .models import Crisis,Call,Plan,SuggestedActions, PlanComments, Profile, Update
 
 import datetime, json, requests
 
@@ -14,7 +14,7 @@ EF_POST_URL = ""
 
 def index(request):
     crisis_set = Crisis.objects.all()
-    if (Profile.role == Profile.GENERAL):
+    if (request.user.profile.role == Profile.GENERAL):
         return render(request,'CMOBackend/newPlan.html', {'plan': plan, 'crisis' : crisis, 'troopEnum': troopEnum, 'sevEnum' :sevEnum})
     return render(request,'CMOBackend/index.html', {'crisis_set': crisis_set})
 
@@ -40,8 +40,7 @@ def newCall(request) :
             CrisisID = crisis_id,
             Title = json_data['Title'],
             Location = json_data['Location'],
-            DateTime = datetime.datetime.today(),
-            Cleared = False
+            DateTime = datetime.datetime.today()
         )
     call = Call(
         CrisisID = crisis,
@@ -104,6 +103,62 @@ def PMOApprove(request):
         changeStatus(plan.CrisisID, Crisis.PLAN_REJECTED_PMO)
     return JsonResponse({'received': True})
 
+# api should call to .../updatePlan
+# json object should be :
+# {
+    # Crisis ID
+    # Status (True , False) 
+    # Description
+# }
+	
+
+@csrf_exempt
+def EFUpdate(request):
+    json_data = json.loads(request.body)
+    crisis_id = json_data['CrisisID']
+    status = json_data['Status']
+    description = json_data['Description']
+    plan = Plan.objects.get(CrisisID = crisis_id)
+    
+    try :
+        crisis = Crisis.objects.get(CrisisID = crisis_id)
+    except Crisis.DoesNotExist :
+        return JsonResponse({'CrisisID does not exist': True})
+    
+    if (status == True):
+        update = Update(
+            CrisisID = crisis,
+            PlanID = plan,
+            Status = Crisis.CRISIS_OVER,
+            Comment = description,
+        )
+        update.save()
+        crisis.CrisisStatus = Crisis.CRISIS_OVER
+        crisis.save()
+    else :
+        update = Update(
+            CrisisID = crisis,
+            PlanID = plan,
+            Status = Crisis.CRISIS_OVER,
+            Comment = description,
+        )
+        update.save()
+        crisis.CrisisStatus = Crisis.NEW_CRISIS
+        crisis.save()
+    return JsonResponse({'received': True})
+    
+    
+    if (plan.CrisisID.CrisisStatus != Crisis.PLAN_APPROVED_GENERAL) :
+        return JsonResponse({'received': False})
+    if (approved == 'True') :
+        changeStatus(plan.CrisisID, Crisis.PLAN_APPROVED_PMO)
+        plan.isApprovedByPMO = True
+        plan.save()
+    else :
+        plan.isApprovedByGeneral = False
+        changeStatus(plan.CrisisID, Crisis.PLAN_REJECTED_PMO)
+    return JsonResponse({'received': True})
+
 def activatePlan(request, plan_id) :
     plan = get_object_or_404(Plan, pk = plan_id)
     crisis = plan.CrisisID
@@ -137,6 +192,10 @@ def editPlan(request, crisis_id):
     return render(request,'CMOBackend/newPlan.html', {'plan': plan, 'crisis' : crisis, 'troopEnum': troopEnum, 'sevEnum' :sevEnum})
 
 def viewPlan(request,crisis_id):
+    plan = Plan.objects.get(CrisisID = crisis_id)
+    print (crisis_id)
+    print ("plan: ", plan)
+    print ("plan_id: ", plan.id)
     crisis = get_object_or_404(Crisis, pk = crisis_id)
     plan_set = crisis.plan_set.all()
     if (not plan_set.exists()) :
