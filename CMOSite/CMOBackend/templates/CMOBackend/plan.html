@@ -83,13 +83,15 @@
   <br />
   <div class="row">
     <!-- if user is not general, do not show this button -->
-    {% if not plan.isApprovedByGeneral %}
+    {% if not plan.isApprovedByGeneral and isGeneral%}
     <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
     {% endif %}
     <!--  if user is not analyst, do not show this button -->
+    {% if isGeneral or isAnalyst%}
     <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" class='btn' >Edit Plan</button></a>
-    {% if plan.isApprovedByPMO %}
+    {% if plan.isApprovedByPMO%}
     <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
+    {% endif %}
     {% endif %}
   </div>
 </div>

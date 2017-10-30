@@ -123,7 +123,7 @@ class SuggestedActions(models.Model):
 # @python_2_unicode_compatible
 class Update(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
-	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE, null = True)
+	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE)
 	Status = models.CharField(max_length=10)
 	Comment = models.CharField(max_length=255)
 

@@ -14,8 +14,6 @@ EF_POST_URL = ""
 
 def index(request):
     crisis_set = Crisis.objects.all()
-    if (request.user.profile.role == Profile.GENERAL):
-        return render(request,'CMOBackend/newPlan.html', {'plan': plan, 'crisis' : crisis, 'troopEnum': troopEnum, 'sevEnum' :sevEnum})
     return render(request,'CMOBackend/index.html', {'crisis_set': crisis_set})
 
 # api should call to .../newCall
@@ -171,7 +169,7 @@ def activatePlan(request, plan_id) :
             'Severity'  : action.SeverityLevel
         })
     EFActivation = {
-        'CrisisID' : crisis.id,
+        'CrisisID' : crisis.CrisisID,
         'PlanID' : plan.id,
         'CrisisType' : plan.CrisisType,
         'Description' : plan.AnalysisOfCase,
@@ -192,15 +190,12 @@ def editPlan(request, crisis_id):
     return render(request,'CMOBackend/newPlan.html', {'plan': plan, 'crisis' : crisis, 'troopEnum': troopEnum, 'sevEnum' :sevEnum})
 
 def viewPlan(request,crisis_id):
-    plan = Plan.objects.get(CrisisID = crisis_id)
-    print (crisis_id)
-    print ("plan: ", plan)
-    print ("plan_id: ", plan.id)
     crisis = get_object_or_404(Crisis, pk = crisis_id)
     plan_set = crisis.plan_set.all()
+    
     if (not plan_set.exists()) :
         return newPlan(request, crisis_id)
-    return render(request,'CMOBackend/plan.html', {'plan': plan_set[0], 'crisis' : crisis})
+    return render(request,'CMOBackend/plan.html', {'plan': plan_set[0], 'crisis' : crisis, 'isGeneral' : request.user.profile.role == Profile.GENERAL , 'isAnalyst' : request.user.profile.role == Profile.ANALYST})
 
 def updatePlan(request, plan_id):
     plan = get_object_or_404(Plan, pk = plan_id)
