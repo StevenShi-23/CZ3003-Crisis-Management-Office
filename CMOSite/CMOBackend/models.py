@@ -123,11 +123,9 @@ class SuggestedActions(models.Model):
 # @python_2_unicode_compatible
 class Update(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
-	DateTime = models.DateTimeField('Date Published')
+	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE)
 	Status = models.CharField(max_length=10)
 	Comment = models.CharField(max_length=255)
-	Location = models.CharField(max_length=200)
-	SeverityLevel = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)])
 
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -143,8 +141,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
     
-    def __str__(self):  # __unicode__ for Python 2
-        return self.user.username
+    # def __str__(self):  # __unicode__ for Python 2
+    #     return self.user.role
 
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
