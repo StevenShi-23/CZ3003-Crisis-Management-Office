@@ -140,7 +140,7 @@ class Profile(models.Model):
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, null=True, blank=True)
-    
+
     # def __str__(self):  # __unicode__ for Python 2
     #     return self.user.role
 

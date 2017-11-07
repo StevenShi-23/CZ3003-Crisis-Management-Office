@@ -81,19 +81,37 @@
     {% endfor %}
   </div>
   <br />
+  <h3>Comments From EF</h3>
   <div class="row">
-    <!-- if user is not general, do not show this button -->
-    {% if not plan.isApprovedByGeneral and isGeneral%}
-    <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
-    {% endif %}
+    {% for update in crisis.update_set.all %}
+    <div class='col-xs-4 col-xs-offset-1'>
+      {{update.Status}}
+    </div>
+    <div class='col-xs-6'>
+      {{update.Comment}}
+    </div>
+    {% endfor %}
+  </div>
+  <br />
+  {% if not isCleared %}
+  <div class="row">
     <!--  if user is not analyst, do not show this button -->
     {% if isGeneral or isAnalyst%}
     <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" class='btn' >Edit Plan</button></a>
-    {% if plan.isApprovedByPMO%}
-    <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
     {% endif %}
+
+    {% if not isActivated %}
+      <!-- if user is not general, do not show this button -->
+      {% if not plan.isApprovedByGeneral and isGeneral%}
+      <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
+      {% endif %}
+
+      {% if plan.isApprovedByPMO%}
+      <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
+      {% endif %}
     {% endif %}
   </div>
+  {% endif %}
 </div>
 </form>
 

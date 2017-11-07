@@ -62,14 +62,6 @@
   </ul>
 </div>
 <br />
-<h3>Comments From PMO</h3>
-<div class="row">
-  {% for comment in plan.plancomments_set.all %}
-  <div class='col-xs-10 col-xs-offset-1'>
-    {{comment.Comment}}
-  </div>
-  {% endfor %}
-</div>
 <input type="hidden" name="total_input_fields"/>
 <input type="submit" class='btn' value="Generate Plan" />
 </form>
