@@ -1,30 +1,90 @@
 <script src = "https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+
 <link rel = "stylesheet" href = "https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
 <link rel = "stylesheet" href = "https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel = "stylesheet" href="../styles/main.css">
+<link rel = "stylesheet" href="../styles/auxiliary_position.css">
+<link rel = "manifest"   href="manifest.json">
 
-<!--Logout-->
-<a href="{% url 'login' %}">Logout</a>
 
-<table class = "mdl-data-table mdl-js-data-table mdl-shadow--2dp">
-  <thead>
-    <tr>
-      <th class = "mdl-data-table__cell--non-numeric">CrisisID</th>
-      <th>Title</th>
-      <th>Time</th>
-      <th>Location</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-<!-- Below is the data table-->
-  <tbody>
-    {% for crisis in crisis_set %}
-    <tr>
-      <td class = "mdl-data-table__cell--non-numeric">{{crisis.id}}</td>
-      <td> <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a></td>
-      <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
-      <td>{{crisis.Location}}</td>
-      <td>{{ crisis.get_CrisisStatus_display }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<style>
+    .demo-layout-transparent .mdl-layout__header,
+    .demo-layout-transparent .mdl-layout__drawer-button {
+        /* This background is dark, so we set text to white. Use 87% black instead if
+           your background is light. */
+        color: grey;
+    }
+</style>
+
+
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+            </div>
+            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+                <h3>Crisis Management System</h3>
+            </div>
+            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+                <div class="mdl-layout-spacer"></div>
+                <!-- Search goes from here-->
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                          mdl-textfield--floating-label mdl-textfield--align-right">
+                    <!-- search icon -->
+                    <label class="mdl-button mdl-js-button mdl-button--icon"
+                           for="fixed-header-drawer-exp">
+                        <i class="material-icons">search</i>
+                    </label>
+                    <!-- expandable input field -->
+                    <!--%TODO : add search funciton here-->
+                    <div class="mdl-textfield__expandable-holder">
+                        <input class="mdl-textfield__input" type="text" name="header"
+                               id="fixed-header-drawer-exp" />
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="col-xs-12" style="height:50px;"></div>
+
+        <!-- Here begins the drawer on the sidebar-->
+        <div class="mdl-layout__drawer ">
+            <span class="mdl-layout-title">Crisis Report</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="{% url 'login' %}">Logout</a>
+            </nav>
+
+        </div>
+
+        <div class="mdl-grid">
+            <div class="mdl-layout-spacer"></div>
+                <div class="mdl-cell mdl-cell--12-col">
+                    <table class = "mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                    <thead>
+                      <tr>
+                        <th class = "mdl-data-table__cell--non-numeric" >CrisisID</th>
+                        <th>Title</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+
+                    <!-- Below is the data table-->
+                    <tbody>
+                      {% for crisis in crisis_set %}
+                      <tr>
+                        <td class = "mdl-data-table__cell--non-numeric">{{crisis.id}}</td>
+                        <td> <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a></td>
+                        <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
+                        <td>{{crisis.Location}}</td>
+                        <td>{{ crisis.get_CrisisStatus_display }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+            <div class="mdl-layout-spacer"></div>
+        </div>
+    </div>>
+</body>
