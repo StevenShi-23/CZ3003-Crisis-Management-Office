@@ -105,24 +105,22 @@ def PMOApprove(request):
 # json object should be :
 # {
     # Crisis ID
-    # Status (True , False) 
-    # Description
+    # Status (True , False)
+    # Comments
 # }
-	
-
 @csrf_exempt
 def EFUpdate(request):
     json_data = json.loads(request.body)
     crisis_id = json_data['CrisisID']
     status = json_data['Status']
-    description = json_data['Description']
+    description = json_data['Comments']
     plan = Plan.objects.get(CrisisID = crisis_id)
-    
+
     try :
         crisis = Crisis.objects.get(CrisisID = crisis_id)
     except Crisis.DoesNotExist :
         return JsonResponse({'CrisisID does not exist': True})
-    
+
     if (status == True):
         update = Update(
             CrisisID = crisis,
@@ -144,8 +142,8 @@ def EFUpdate(request):
         crisis.CrisisStatus = Crisis.NEW_CRISIS
         crisis.save()
     return JsonResponse({'received': True})
-    
-    
+
+
     if (plan.CrisisID.CrisisStatus != Crisis.PLAN_APPROVED_GENERAL) :
         return JsonResponse({'received': False})
     if (approved == 'True') :
@@ -161,12 +159,11 @@ def activatePlan(request, plan_id) :
     plan = get_object_or_404(Plan, pk = plan_id)
     crisis = plan.CrisisID
     changeStatus(plan.CrisisID, "PA")
-    print(request.POST['lat'])
     actions = []
     for action in plan.suggestedactions_set.all() :
         actions.append({
-            'TroopType' : action.get_TypeTroop_display(),
-            'Severity'  : action.SeverityLevel
+            'DepartmentType' : action.get_TypeTroop_display(),
+            'SeverityRating'  : action.SeverityLevel
         })
     EFActivation = {
         'CrisisID' : crisis.CrisisID,
@@ -174,10 +171,15 @@ def activatePlan(request, plan_id) :
         'CrisisType' : plan.CrisisType,
         'Description' : plan.AnalysisOfCase,
         'Lat': request.POST['lat'],
-        'Lng': request.POST['lng'],
+        'Lon': request.POST['lng'],
         'SuggestedActions': actions
     }
-    # requests.post(EF_POST_URL, data=EFActivation)
+    plan.isApprovedByGeneral = False
+    plan.isApprovedByPMO = False
+    plan.save()
+    headers = {'content-type': 'application/json'}
+    r=requests.post('http://efds.herokuapp.com/hq/orderHQ', data=json.dumps(EFActivation), headers=headers)
+
     return HttpResponseRedirect(reverse('CMOBackend:index'))
 
 def editPlan(request, crisis_id):
@@ -192,7 +194,7 @@ def editPlan(request, crisis_id):
 def viewPlan(request,crisis_id):
     crisis = get_object_or_404(Crisis, pk = crisis_id)
     plan_set = crisis.plan_set.all()
-    
+
     if (not plan_set.exists()) :
         return newPlan(request, crisis_id)
     return render(request,'CMOBackend/plan.html', {'plan': plan_set[0], 'crisis' : crisis, 'isGeneral' : request.user.profile.role == Profile.GENERAL , 'isAnalyst' : request.user.profile.role == Profile.ANALYST})
@@ -216,6 +218,9 @@ def savePlan(request, crisis_id) :
     else :
         plan = plan_set[0]
     totalActions = int(request.POST['total_input_fields'])
+    plan.AnalysisOfCase = request.POST['AnalysisOfCase']
+    plan.CrisisType = request.POST['crisis_choices']
+    plan.Datetime = datetime.datetime.today()
     plan.isApprovedByGeneral = False
     plan.isApprovedByPMO = False
     plan.save()
