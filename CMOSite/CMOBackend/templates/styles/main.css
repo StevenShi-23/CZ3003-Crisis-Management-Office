@@ -48,7 +48,7 @@ html, body {
   padding-left: 16px;
   box-sizing: border-box;
   height: 100%;
-  width: 100%;
+  width: 80%;
 }
 .mdl-demo .mdl-layout__tab-bar .mdl-layout__tab {
   height: 64px;

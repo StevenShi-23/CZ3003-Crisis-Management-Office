@@ -1,102 +1,131 @@
 {% extends "CMOBackend/base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-pink.min.css">
+<link rel = "manifest"   href="manifest.json">
+<link rel = "stylesheet" href="../styles/main.css">
 
-<form action="{% url 'CMOBackend:activatePlan' plan.id %}" method="post">
-{% csrf_token %}
-<input id='location' type="hidden" value="{{ crisis.Location }}" name="location"/>
-<input id='lat' type="hidden" value="" name="lat"/>
-<input id='lng' type="hidden" value="" name="lng"/>
-<h1>{{ crisis.Title }}</h1>
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+    <form action="{% url 'CMOBackend:activatePlan' plan.id %}" method="post">
+    {% csrf_token %}
+    <input id='location' type="hidden" value="{{ crisis.Location }}" name="location"/>
+    <input id='lat' type="hidden" value="" name="lat"/>
+    <input id='lng' type="hidden" value="" name="lng"/>
 
-<div class='container'>
-  <div class="row">
-    <div class="col-xs-12">
-      <h3>{{ plan.AnalysisOfCase }}</h3>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-xs-2">
-      Date of Last Update
-    </div>
-    <div class="col-xs-1">
-      :
-    </div>
-    <div class="col-xs-3">
-      {{plan.Datetime|date:'d-m-Y H:i'}}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-xs-2">
-      Map
-    </div>
-    <div class="col-xs-1">
-      :
-    </div>
-    <div class="col-xs-3">
-      <a href="{% url 'CMOBackend:map' crisis.id %}">Access the Map</a>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-xs-2">
-      Crisis Type
-    </div>
-    <div class="col-xs-1">
-      :
-    </div>
-    <div class="col-xs-3">
-      {{plan.get_CrisisType_display}}
-    </div>
-  </div>
+          <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+            </div>
+            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+              <h3>{{ crisis.Title }}</h3>
+            </div>
+            <div class="mdl-layout--large-screen-only mdl-layout__header-row"></div>
+            <div class="mdl-layout__tab-bar-container">
+                  <div class="mdl-layout__tab-bar  mdl-color--primary-dark">
+                      <!-- TODO: modify the href tag here.-->
+                      <a href="#summery" class="mdl-layout__tab is-active">Summery</a>
+                      <a href="#plan" class="mdl-layout__tab">Plan for action</a>
+                      <a href="#map" class="mdl-layout__tab">Map</a>
+                      <a href="#pmo" class="mdl-layout__tab">Communication with PMO</a>
+                  </div>>
+            </div>
+          </header>
 
-  {% for action in plan.suggestedactions_set.all %}
-  <div class="row">
-    <div class="col-xs-2">
-      Security Level
-    </div>
-    <div class="col-xs-1">
-      :
-    </div>
-    <div class="col-xs-3">
-      {{action.SeverityLevel}}
-    </div>
-    <div class="col-xs-2">
-      Troop Type
-    </div>
-    <div class="col-xs-1">
-      :
-    </div>
-    <div class="col-xs-3">
-      {{action.get_TypeTroop_display}}
-    </div>
-  </div>
-  {% endfor %}
-  <br />
-  <h3>Comments From PMO</h3>
-  <div class="row">
-    {% for comment in plan.plancomments_set.all %}
-    <div class='col-xs-10 col-xs-offset-1'>
-      {{comment.Comment}}
-    </div>
-    {% endfor %}
-  </div>
-  <br />
-  <div class="row">
-    <!-- if user is not general, do not show this button -->
-    {% if not plan.isApprovedByGeneral and isGeneral%}
-    <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
-    {% endif %}
-    <!--  if user is not analyst, do not show this button -->
-    {% if isGeneral or isAnalyst%}
-    <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" class='btn' >Edit Plan</button></a>
-    {% if plan.isApprovedByPMO%}
-    <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
-    {% endif %}
-    {% endif %}
-  </div>
-</div>
-</form>
+          <!-- Here begins the drawer on the sidebar-->
+          <div class="mdl-layout__drawer ">
+            <span class="mdl-layout-title">Detailed Report</span>
+            <nav class="mdl-navigation">
+              <a class="mdl-navigation__link" href="{% url 'login' %}">Logout</a>
+            </nav>
+          </div>
 
+        <div class='container'>
+          <div class="row">
+            <div class="col-xs-12">
+              <h3>{{ plan.AnalysisOfCase }}</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-2">
+              Date of Last Update
+            </div>
+            <div class="col-xs-1">
+              :
+            </div>
+            <div class="col-xs-3">
+              {{plan.Datetime|date:'d-m-Y H:i'}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-2">
+              Map
+            </div>
+            <div class="col-xs-1">
+              :
+            </div>
+            <div class="col-xs-3">
+              <a href="{% url 'CMOBackend:map' crisis.id %}">Access the Map</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-2">
+              Crisis Type
+            </div>
+            <div class="col-xs-1">
+              :
+            </div>
+            <div class="col-xs-3">
+              {{plan.get_CrisisType_display}}
+            </div>
+          </div>
+
+          {% for action in plan.suggestedactions_set.all %}
+          <div class="row">
+            <div class="col-xs-2">
+              Security Level
+            </div>
+            <div class="col-xs-1">
+              :
+            </div>
+            <div class="col-xs-3">
+              {{action.SeverityLevel}}
+            </div>
+            <div class="col-xs-2">
+              Troop Type
+            </div>
+            <div class="col-xs-1">
+              :
+            </div>
+            <div class="col-xs-3">
+              {{action.get_TypeTroop_display}}
+            </div>
+          </div>
+          {% endfor %}
+          <br />
+          <h3>Comments From PMO</h3>
+          <div class="row">
+            {% for comment in plan.plancomments_set.all %}
+            <div class='col-xs-10 col-xs-offset-1'>
+              {{comment.Comment}}
+            </div>
+            {% endfor %}
+          </div>
+          <br />
+          <div class="row">
+            <!-- if user is not general, do not show this button -->
+            {% if not plan.isApprovedByGeneral and isGeneral%}
+            <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
+            {% endif %}
+            <!--  if user is not analyst, do not show this button -->
+            {% if isGeneral or isAnalyst%}
+            <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" class='btn' >Edit Plan</button></a>
+            {% if plan.isApprovedByPMO%}
+            <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        </form>
+</body>>
 {% load static %}
 <script src="{% static 'CMOBackend/plan.js' %}"> </script>
 
