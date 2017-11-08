@@ -34,7 +34,7 @@
       :
     </div>
     <div class="col-xs-3">
-      <a href="{% url 'CMOBackend:map' crisis.id %}">Access the Map</a>
+      <a href="{% url 'CMOBackend:map' crisis.CrisisID %}">Access the Map</a>
     </div>
   </div>
   <div class="row">
@@ -52,7 +52,7 @@
   {% for action in plan.suggestedactions_set.all %}
   <div class="row">
     <div class="col-xs-2">
-      Security Level
+      Severity Level
     </div>
     <div class="col-xs-1">
       :
@@ -103,7 +103,7 @@
     {% if not isActivated %}
       <!-- if user is not general, do not show this button -->
       {% if not plan.isApprovedByGeneral and isGeneral%}
-      <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
+      <a href="#" onclick="gApprove('{% url 'CMOBackend:gApprovePlan' plan.id %}')" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
       {% endif %}
 
       {% if plan.isApprovedByPMO%}

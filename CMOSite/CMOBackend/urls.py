@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'^(?P<crisis_id>[0-9]+)/plan/edit$', views.editPlan, name='editPlan'),
     url(r'^planFeedback$', views.PMOApprove, name='PMOApprove'),
     url(r'^updatePlan$', views.EFUpdate, name='EFUpdate'),
+    url(r'^getCase$', views.getPlan, name='getCase'),
 ]
