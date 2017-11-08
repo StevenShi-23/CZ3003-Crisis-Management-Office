@@ -229,7 +229,7 @@ def maps(request):
 def map(request, crisis_id):
     crisis = Crisis.objects.get(CrisisID = crisis_id)
 
-    return render(request,'CMOBackend/map', {'crisis_set' : crisis})
+    return render(request,'CMOBackend/map', {'crisis_set' : [crisis]})
 
 def changeStatus(crisis,newStatus) :
     crisis.CrisisStatus = newStatus

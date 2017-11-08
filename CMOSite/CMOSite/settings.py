@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-DATABASES['default']= db_from_env
+# DATABASES['default']= db_from_env
 
 
 # Password validation
