@@ -62,7 +62,7 @@
 
                             {% for crisis in crisis_set %}
                             <tr>
-                            <td>{{crisis.id}}</td>
+                            <td>{{crisis.CrisisID}}</td>
                             <td>
                                     <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a>
                                 </td>

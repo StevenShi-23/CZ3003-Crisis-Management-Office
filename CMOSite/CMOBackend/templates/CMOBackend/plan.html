@@ -45,7 +45,7 @@
                         <!--Summery of crisis-->
                         <div class="row">
                             <div class="col-xs-12">
-                                <h3>Summery</h3>
+                                <h3>Summary</h3>
                             </div>
                         </div>
                         <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
@@ -80,8 +80,7 @@
                                 width="400"
                                 height="300"
                                 frameborder="0" style="border:0"
-                                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDuf_aBlMIrkbcwOsuvyuwLkEMxSojLLzs
-                                    &q="+{{crisis.location}}
+                                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDuf_aBlMIrkbcwOsuvyuwLkEMxSojLLzs&q={{crisis.Location}}"
                                 allowfullscreen>
                         </iframe>
                         <!--<div class="row">-->
@@ -92,7 +91,7 @@
                                 <!--:-->
                             <!--</div>-->
                             <!--<div class="col-xs-3">-->
-                                <!--<a href="{% url 'CMOBackend:map' crisis.id %}">Access the Map</a>-->
+                                <!--<a href="{% url 'CMOBackend:map' crisis.CrisisID %}">Access the Map</a>-->
                             <!--</div>-->
                         <!--</div>-->
 
