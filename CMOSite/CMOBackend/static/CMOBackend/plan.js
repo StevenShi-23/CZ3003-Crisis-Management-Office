@@ -63,3 +63,13 @@ function addAction() {
 function removeAction(li_id) {
   $("#"+li_id).remove();
 }
+
+function gApprove(url) {
+  //reload current page
+  location.reload();
+  //Open in new tab
+  window.open(url, '_blank');
+  //focus to thet window
+  window.focus();
+
+}

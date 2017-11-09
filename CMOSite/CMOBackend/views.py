@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404, reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 
@@ -9,7 +11,8 @@ from .models import Crisis,Call,Plan,SuggestedActions, PlanComments, Profile, Up
 
 import datetime, json, requests
 
-PMO_POST_URL = ""
+PMO_URL = "http://118.200.75.51"
+PMO_GET_URL = "http://118.200.75.51/api/channels/retrieve/"
 EF_POST_URL = ""
 
 def index(request):
@@ -70,8 +73,7 @@ def gApprovePlan(request, plan_id):
         'Map' : plan.Map,
         'SuggestedActions' : actions
     }
-    # requests.post(PMO_POST_URL, data=planInfo)
-    return HttpResponseRedirect(reverse('CMOBackend:index'))
+    return redirect(PMO_URL)
 
 # api should call to .../planFeedback
 # json object should be :
@@ -83,23 +85,29 @@ def gApprovePlan(request, plan_id):
 @csrf_exempt
 def PMOApprove(request):
     json_data = json.loads(request.body)
-    plan_id = json_data['PlanID']
-    approved = json_data['Approved']
-    plan = get_object_or_404(Plan, pk = plan_id)
-    comments, created=PlanComments.objects.get_or_create(
-        PlanID = plan,
-        Comment = json_data['Comments'],
-    )
-    if (plan.CrisisID.CrisisStatus != Crisis.PLAN_APPROVED_GENERAL) :
-        return JsonResponse({'received': False})
-    if (approved == 'True') :
+    caseId = json_data['caseid']
+    try :
+        crisis = Crisis.objects.get(CrisisID = caseId)
+    except Crisis.DoesNotExist :
+        returnResponse = JsonResponse({'CrisisID does not exist': True})
+        returnResponse['Access-Control-Allow-Origin'] = '*'
+        return returnResponse
+
+    plan = crisis.plan_set.all()[0]
+    r = requests.get(PMO_GET_URL+str(caseId))
+    response = r.json()
+    if (response['approved']) :
         changeStatus(plan.CrisisID, Crisis.PLAN_APPROVED_PMO)
         plan.isApprovedByPMO = True
-        plan.save()
     else :
+        plan.isApprovedByPMO = False
         plan.isApprovedByGeneral = False
         changeStatus(plan.CrisisID, Crisis.PLAN_REJECTED_PMO)
-    return JsonResponse({'received': True})
+
+    plan.save()
+    returnResponse = JsonResponse({'received': True})
+    returnResponse['Access-Control-Allow-Origin'] = '*'
+    return returnResponse
 
 # api should call to .../updatePlan
 # json object should be :
@@ -132,7 +140,8 @@ def EFUpdate(request):
     update.save()
     if (realStatus) :
         changeStatus(crisis,Crisis.CRISIS_OVER)
-
+    else :
+        changeStatus(crisis,Crisis.UPDATE_PENDING)
     return JsonResponse({'received': True})
 
 def activatePlan(request, plan_id) :
@@ -226,6 +235,7 @@ def maps(request):
     crisis_set = Crisis.objects.all()
     return render(request, 'CMOBackend/map',  {'crisis_set': crisis_set})
 
+@xframe_options_exempt
 def map(request, crisis_id):
     crisis = Crisis.objects.get(CrisisID = crisis_id)
 
@@ -235,3 +245,27 @@ def changeStatus(crisis,newStatus) :
     crisis.CrisisStatus = newStatus
     crisis.save()
     return
+
+@csrf_exempt
+def getPlan(request) :
+    json_data = json.loads(request.body)
+    crisis_id = json_data['caseid']
+    crisis = Crisis.objects.get(CrisisID = crisis_id)
+    plan = crisis.plan_set.all()[0]
+    actions = plan.suggestedactions_set.all()
+    caseDescription = crisis.Title
+    caseLocation = crisis.Location
+
+    efForce= ''
+    for action in actions :
+        efForce= efForce + action.get_TypeTroop_display() +','+ str(action.SeverityLevel)+','
+    efForce = efForce [:-1]
+    payload = {
+        "caseDescription" : caseDescription,
+        "caseLocation" : caseLocation,
+        "efForce" : efForce
+    }
+    response = JsonResponse(payload)
+    response['Access-Control-Allow-Origin'] = '*'
+
+    return response

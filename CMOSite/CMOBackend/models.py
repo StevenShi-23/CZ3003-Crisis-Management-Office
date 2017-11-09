@@ -129,7 +129,7 @@ class SuggestedActions(models.Model):
 class Update(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
 	PlanID = models.ForeignKey(Plan, on_delete=models.CASCADE)
-	Status = models.CharField(max_length=10)
+	Status = models.CharField(max_length=255)
 	Comment = models.CharField(max_length=255)
 
 from django.contrib.auth.models import User
