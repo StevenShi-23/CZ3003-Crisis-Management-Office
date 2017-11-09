@@ -65,11 +65,13 @@ function removeAction(li_id) {
 }
 
 function gApprove(url) {
-  //reload current page
-  location.reload();
   //Open in new tab
   window.open(url, '_blank');
   //focus to thet window
   window.focus();
 
+  setTimeout(function(){
+    //reload current page
+    location.reload();
+  }, 1000);
 }

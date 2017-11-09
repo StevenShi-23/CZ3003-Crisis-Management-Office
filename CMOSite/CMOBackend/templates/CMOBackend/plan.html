@@ -139,7 +139,7 @@
                         <div class="row">
                             <!-- if user is not general, do not show this button -->
                             {% if not plan.isApprovedByGeneral and isGeneral%}
-                            <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
+                            <a onclick="gApprove('{% url 'CMOBackend:gApprovePlan' plan.id %}')" target='_blank' ><button type="button" class='btn btn-success' >Approve Plan</button></a>
                             {% endif %}
                             <!--  if user is not analyst, do not show this button -->
                             {% if isGeneral or isAnalyst%}
@@ -170,11 +170,11 @@
         <!--</section>-->
 
         <!-- Chatting window with PMO -->
-        <section class="mdl-layout__tab-panel" id="chat">
+        <!-- <section class="mdl-layout__tab-panel" id="chat">
             <div class="page-content">
                 <h1>Liason with PMO</h1>
             </div>
-        </section>
+        </section> -->
     </main>
 
 
