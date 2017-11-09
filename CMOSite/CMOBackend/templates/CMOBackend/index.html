@@ -3,7 +3,12 @@
 <link rel = "stylesheet" href = "https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
 <link rel = "stylesheet" href = "https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel = "manifest"   href="manifest.json">
+<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="manifest" href="manifest.json">
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">
 
 
 <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
@@ -14,24 +19,24 @@
             <div class="mdl-layout--large-screen-only mdl-layout__header-row">
                 <h3>Crisis Management System</h3>
             </div>
-            <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+            <!-- <div class="mdl-layout--large-screen-only mdl-layout__header-row">
                 <div class="mdl-layout-spacer"></div>
-                <!-- Search goes from here-->
+                <!-- Search goes from here
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
-                          mdl-textfield--floating-label mdl-textfield--align-right">
-                    <!-- search icon -->
-                    <label class="mdl-button mdl-js-button mdl-button--icon"
+                          mdl-textfield--floating-label mdl-textfield--align-right"> -->
+                <!-- search icon -->
+                <!-- <label class="mdl-button mdl-js-button mdl-button--icon"
                            for="fixed-header-drawer-exp">
                         <i class="material-icons">search</i>
-                    </label>
-                    <!-- expandable input field -->
-                    <!--%TODO : add search funciton here-->
+                    </label> -->
+                <!-- expandable input field -->
+                <!-- %TODO : add search funciton here
                     <div class="mdl-textfield__expandable-holder">
                         <input class="mdl-textfield__input" type="text" name="header"
                                id="fixed-header-drawer-exp" />
-                    </div>
-                </div>
-            </div>
+                    </div> -->
+                <!-- </div> -->
+            <!-- </div> -->
         </header>
 
         <div class="col-xs-12" style="height:50px;"></div>
@@ -42,37 +47,93 @@
             <nav class="mdl-navigation">
                 <a class="mdl-navigation__link" href="{% url 'login' %}">Logout</a>
             </nav>
+
         </div>
 
         <div class="mdl-grid">
             <div class="mdl-layout-spacer"></div>
-                <div class="mdl-cell mdl-cell--12-col">
-                    <table class = "mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+            <div class="mdl-cell mdl-cell--12-col">
+                <!-- <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
                     <thead>
-                      <tr>
-                        <th class = "mdl-data-table__cell--non-numeric" >CrisisID</th>
-                        <th>Title</th>
-                        <th>Time</th>
-                        <th>Location</th>
-                        <th>Status</th>
-                      </tr>
+                        <tr>
+                            <th class="mdl-data-table__cell--non-numeric">CrisisID</th>
+                            <th>Title</th>
+                            <th>Time</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
                     </thead>
 
                     <!-- Below is the data table-->
-                    <tbody>
-                      {% for crisis in crisis_set %}
-                      <tr>
-                        <td class = "mdl-data-table__cell--non-numeric">{{crisis.id}}</td>
-                        <td> <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a></td>
-                        <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
-                        <td>{{crisis.Location}}</td>
-                        <td>{{ crisis.get_CrisisStatus_display }}</td>
-                      </tr>
-                      {% endfor %}
+                    <!-- <tbody>
+                        {% for crisis in crisis_set %}
+                        <tr>
+                            <td class="mdl-data-table__cell--non-numeric">{{crisis.id}}</td>
+                            <td>
+                                <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a>
+                            </td>
+                            <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
+                            <td>{{crisis.Location}}</td>
+                            <td>{{ crisis.get_CrisisStatus_display }}</td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
+                </table> -->
+
+                <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%" style="background-color: white;">
+                        <thead>
+                        <tr>
+                            <th>CrisisID</th>
+                            <th>Title</th>
+                            <th>Time</th>
+                            <th>location</th>
+                            <th>Status</th>
+
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                                <th>CrisisID</th>
+                                <th>Title</th>
+                                <th>Time</th>
+                                <th>location</th>
+                                <th>Status</th>
+
+                        </tr>
+                        </tfoot>
+                        <tbody>
+
+
+                            {% for crisis in crisis_set %}
+                            <tr>
+                            <td>{{crisis.id}}</td>
+                            <td>
+                                    <a style="color: gray;" href="{% url 'CMOBackend:viewPlan' crisis.id %}">{{crisis.Title}}</a>
+                                </td>
+                            <td>{{crisis.DateTime|date:'d-m-Y H:i'}}</td>
+                            <td>{{crisis.Location}}</td>
+                            <td>{{ crisis.get_CrisisStatus_display }}</td>
+                            </tr>
+                            {% endfor %}
+
+
+
+                        </tbody>
                     </table>
-                </div>
+            </div>
             <div class="mdl-layout-spacer"></div>
         </div>
     </div>>
 </body>
+
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+<script>
+        $(document).ready(function() {
+            $('#example').DataTable();
+        } );
+
+    </script>
