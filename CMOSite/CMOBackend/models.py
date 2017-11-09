@@ -52,6 +52,11 @@ class Crisis(models.Model):
 		# }
 		return (data["results"][0]["geometry"]["location"])
 
+	# For displaying embedded  map in plan.html
+	def getEmbeddedView(self):
+	    urlString = "https://www.google.com/maps/embed/v1/place?key=AIzaSyAxmNbmdGzDgu_sdi7Je0ENXOmDm80P7wU&q="+self.Location
+	    return urlString
+
 @python_2_unicode_compatible
 class Call(models.Model):
 	CrisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
