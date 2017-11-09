@@ -112,53 +112,33 @@ def PMOApprove(request):
 def EFUpdate(request):
     json_data = json.loads(request.body)
     crisis_id = json_data['CrisisID']
+    plan_id = json_data['PlanID']
     status = json_data['Status']
     description = json_data['Comments']
-    plan = Plan.objects.get(CrisisID = crisis_id)
+    plan = get_object_or_404(Plan, pk = plan_id)
 
+    realStatus = status == "Cleared"
     try :
         crisis = Crisis.objects.get(CrisisID = crisis_id)
     except Crisis.DoesNotExist :
         return JsonResponse({'CrisisID does not exist': True})
 
-    if (status == True):
-        update = Update(
-            CrisisID = crisis,
-            PlanID = plan,
-            Status = Crisis.CRISIS_OVER,
-            Comment = description,
-        )
-        update.save()
-        crisis.CrisisStatus = Crisis.CRISIS_OVER
-        crisis.save()
-    else :
-        update = Update(
-            CrisisID = crisis,
-            PlanID = plan,
-            Status = Crisis.CRISIS_OVER,
-            Comment = description,
-        )
-        update.save()
-        crisis.CrisisStatus = Crisis.NEW_CRISIS
-        crisis.save()
-    return JsonResponse({'received': True})
+    update = Update(
+        CrisisID = crisis,
+        PlanID = plan,
+        Status = status,
+        Comment = description,
+    )
+    update.save()
+    if (realStatus) :
+        changeStatus(crisis,Crisis.CRISIS_OVER)
 
-
-    if (plan.CrisisID.CrisisStatus != Crisis.PLAN_APPROVED_GENERAL) :
-        return JsonResponse({'received': False})
-    if (approved == 'True') :
-        changeStatus(plan.CrisisID, Crisis.PLAN_APPROVED_PMO)
-        plan.isApprovedByPMO = True
-        plan.save()
-    else :
-        plan.isApprovedByGeneral = False
-        changeStatus(plan.CrisisID, Crisis.PLAN_REJECTED_PMO)
     return JsonResponse({'received': True})
 
 def activatePlan(request, plan_id) :
     plan = get_object_or_404(Plan, pk = plan_id)
     crisis = plan.CrisisID
-    changeStatus(plan.CrisisID, "PA")
+    changeStatus(plan.CrisisID, Crisis.PLAN_ACTIVATED)
     actions = []
     for action in plan.suggestedactions_set.all() :
         actions.append({
@@ -197,12 +177,14 @@ def viewPlan(request,crisis_id):
 
     if (not plan_set.exists()) :
         return newPlan(request, crisis_id)
-    return render(request,'CMOBackend/plan.html', {'plan': plan_set[0], 'crisis' : crisis, 'isGeneral' : request.user.profile.role == Profile.GENERAL , 'isAnalyst' : request.user.profile.role == Profile.ANALYST})
-
-def updatePlan(request, plan_id):
-    plan = get_object_or_404(Plan, pk = plan_id)
-    changeStatus(plan.CrisisID, "UP")
-    pass
+    return render(request,'CMOBackend/plan.html',
+                    {
+                    'plan': plan_set[0],
+                    'crisis' : crisis,
+                    'isGeneral' : request.user.profile.role == Profile.GENERAL ,
+                    'isAnalyst' : request.user.profile.role == Profile.ANALYST,
+                    'isActivated': crisis.CrisisStatus == Crisis.PLAN_ACTIVATED,
+                    'isCleared': crisis.CrisisStatus == Crisis.CRISIS_OVER})
 
 def savePlan(request, crisis_id) :
     crisis = get_object_or_404(Crisis, pk = crisis_id)
@@ -213,7 +195,7 @@ def savePlan(request, crisis_id) :
              Datetime = datetime.datetime.today(),
              CrisisType = request.POST['crisis_choices'],
              AnalysisOfCase = request.POST['AnalysisOfCase'],
-             Map = "https://cz3003.herokuapp.com/"+str(crisis_id)+"/map"
+             Map = "https://cz3003.herokuapp.com/cmo/"+str(crisis.CrisisID)+"/map"
              )
     else :
         plan = plan_set[0]
@@ -245,8 +227,9 @@ def maps(request):
     return render(request, 'CMOBackend/map',  {'crisis_set': crisis_set})
 
 def map(request, crisis_id):
-    crisis = Crisis.objects.filter(pk = crisis_id)
-    return render(request,'CMOBackend/map', {'crisis_set' : crisis})
+    crisis = Crisis.objects.get(CrisisID = crisis_id)
+
+    return render(request,'CMOBackend/map', {'crisis_set' : [crisis]})
 
 def changeStatus(crisis,newStatus) :
     crisis.CrisisStatus = newStatus
