@@ -1,0 +1,186 @@
+{% extends "CMOBackend/base.html" %}
+
+{% block content %}
+
+<head>
+    <title>Crisis Management Office </title>
+    <!-- Material Design Lite -->
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.indigo-pink.min.css" /></head>
+<style>
+    body{background:#eee;}
+</style>
+
+<body>
+<!-- Layout Container with Fixed Header and Tabs -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+    <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+        <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+        </div>
+        <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+            <h3>{{ crisis.Title }}</h3>
+        </div>
+    </header>
+
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Crisis Report</span>
+        <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="{% url 'CMOBackend:index' %}">Back to Dashboard</a>
+            <a class="mdl-navigation__link" href="{% url 'login' %}">Logout</a>
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <!-- Details Page -->
+        <section class="mdl-layout__tab-panel is-active" id="detail">
+            <div class="page-content">
+                <form action="{% url 'CMOBackend:activatePlan' plan.id %}" method="post">
+                    {% csrf_token %}
+                    <input id='location' type="hidden" value="{{ crisis.Location }}" name="location"/>
+                    <input id='lat' type="hidden" value="" name="lat"/>
+                    <input id='lng' type="hidden" value="" name="lng"/>
+
+
+                    <div class='container col-md-8 col-md-offset-2'>
+                        <!--Summery of crisis-->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3>Summery</h3>
+                            </div>
+                        </div>
+                        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                            <tbody>
+                            <tr>
+                                <td class="mdl-data-table__cell--non-numeric">Crisis ID</td>
+                                <td>{{crisis.CrisisID}}</td>
+                            </tr>
+                            <tr>
+                                <td class="mdl-data-table__cell--non-numeric">Date of Last Update</td>
+                                <td>{{plan.Datetime|date:'d-m-Y H:i'}}</td>
+                            </tr>
+                            <tr>
+                                <td class="mdl-data-table__cell--non-numeric">Crisis Type</td>
+                                <td>{{plan.get_CrisisType_display}}</td>
+                            </tr>
+                            <tr>
+                                <td class="mdl-data-table__cell--non-numeric"> Location</td>
+                                <td>{{ crisis.Location}}</td>
+                            </tr>
+                            <tr>
+                                <td class="mdl-data-table__cell--non-numeric"> Status</td>
+                                <td>{{ crisis.get_CrisisStatus_display }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- Below is a vertical spacer-->
+                        <div class="col-xs-12" style="height:50px;"></div>
+
+                        <!--TODO : use iframe to place an embedded view here-->
+                        <iframe
+                                width="400"
+                                height="300"
+                                frameborder="0" style="border:0"
+                                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDuf_aBlMIrkbcwOsuvyuwLkEMxSojLLzs
+                                    &q="+{{crisis.location}}
+                                allowfullscreen>
+                        </iframe>
+                        <!--<div class="row">-->
+                            <!--<div class="col-xs-2">-->
+                                <!--Map-->
+                            <!--</div>-->
+                            <!--<div class="col-xs-1">-->
+                                <!--:-->
+                            <!--</div>-->
+                            <!--<div class="col-xs-3">-->
+                                <!--<a href="{% url 'CMOBackend:map' crisis.id %}">Access the Map</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+
+                        <div class="col-xs-12" style="height:50px;"></div>
+
+                        <!--Analysis-->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3>Analysis Of Crisis</h3>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-xs-12">
+                                <h6>{{ plan.AnalysisOfCase }}</h6>
+                        </div>
+                            {% for action in plan.suggestedactions_set.all %}
+                        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">Troop Type</th>
+                                <th>Security Level</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="mdl-data-table__cell--non-numeric">{{action.get_TypeTroop_display}}</td>
+                                <td>{{action.SeverityLevel}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        {% endfor %}
+                            <div class="col-xs-12" style="height:50px;"></div>
+
+
+                        <h3>Comments From PMO</h3>
+                        <div class="row">
+                            {% for comment in plan.plancomments_set.all %}
+                            <div class='col-xs-10 col-xs-offset-1'>
+                                <h6><b>{{comment.Comment}}</b></h6>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <!-- if user is not general, do not show this button -->
+                            {% if not plan.isApprovedByGeneral and isGeneral%}
+                            <a href="{% url 'CMOBackend:gApprovePlan' plan.id %}" ><button type="button" class='btn btn-success' >Approve Plan</button></a>
+                            {% endif %}
+                            <!--  if user is not analyst, do not show this button -->
+                            {% if isGeneral or isAnalyst%}
+                            <a href="{% url 'CMOBackend:editPlan' crisis.id %}" ><button type="button" class='btn' >Edit Plan</button></a>
+                            {% if plan.isApprovedByPMO%}
+                            <a href="{% url 'CMOBackend:activatePlan' plan.id %}" ><button type="submit" class='btn btn-danger' >Activate Plan</button></a>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!--&lt;!&ndash; Updates from EF Page &ndash;&gt;-->
+        <!--<section class="mdl-layout__tab-panel" id="update">-->
+            <!--<div class="page-content">-->
+                <!--<h3>Update from EF</h3>-->
+            <!--</div>-->
+        <!--</section>-->
+
+        <!-- Planning Page -->
+        <!--<section class="mdl-layout__tab-panel" id="plan">-->
+            <!--<div class="page-content">-->
+                <!--<a href="./newPlan.html"></a>-->
+            <!--</div>-->
+        <!--</section>-->
+
+        <!-- Chatting window with PMO -->
+        <section class="mdl-layout__tab-panel" id="chat">
+            <div class="page-content">
+                <h1>Liason with PMO</h1>
+            </div>
+        </section>
+    </main>
+
+
+
+</div>
+
+</body>
+{% endblock content %}
